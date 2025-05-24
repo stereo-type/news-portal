@@ -1,7 +1,18 @@
-{% extends 'base.html.twig' %}
+{% extends 'security/auth.html.twig' %}
 
-{% block body %}
-    <h1>Check Telegram</h1>
-    <p>Please check your Telegram channel for a confirmation code and enter it below.</p>
-    <a href="{{ path('app_verify') }}">Enter confirmation code</a>
+{% block page %}
+    <h1>Проверьте телеграмм</h1>
+    <p>Вы успешно зарегистрировались, проверьте канал в телеграмме</p>
+    <p>
+        <a href="{{ path('app_verify', {'id': id}) }}">Ввести код подтверждения</a>
+    </p>
+    <p>
+        <a href="{{ path('app_resend', {'id': id}) }}"
+           data-controller="resend-link"
+           data-action="click->resend-link#handleResend"
+           data-turbo="false"
+        >
+            Отправить повторно
+        </a>
+    </p>
 {% endblock %}

@@ -130,6 +130,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = $roles;
     }
 
+    /**
+     * @return Collection<int,TelegramCode>
+     */
     public function getTelegramCodes(): Collection
     {
         return $this->telegramCodes;

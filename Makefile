@@ -56,3 +56,6 @@ debug-dotenv:
 	php bin/console debug:dotenv
 debug-vars:
 	symfony console debug:container --env-vars
+
+consume:
+	php bin/console messenger:consume telegram --verbose

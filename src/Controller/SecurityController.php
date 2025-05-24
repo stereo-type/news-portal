@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class SecurityController extends AbstractController
 {
@@ -15,12 +16,20 @@ class SecurityController extends AbstractController
     public function login(Request $request, AuthenticationUtils $utils): Response
     {
         $error = $utils->getLastAuthenticationError();
-        $form = $this->createForm(LoginTypeForm::class, ['_username' => $utils->getLastUsername()]);
+        $errorMessage = $error?->getMessage();
+        $form = $this->createForm(LoginTypeForm::class, ['username' => $utils->getLastUsername()]);
         $form->handleRequest($request);
+
+        $exception = $request->getSession()->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
+
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->redirectToRoute('app_main');
+        }
 
         return $this->render('security/login.html.twig', [
             'loginForm' => $form->createView(),
-            'error' => $error?->getMessage(),
+            'error' => $errorMessage,
         ]);
     }
 

@@ -26,7 +26,8 @@ class TelegramCodeGenerator
     {
         $code = new TelegramCode();
         $code->setUser($user);
-        $code->setCode(random_int(100000, 999999));
+        $code->setCode((string)random_int(100000, 999999));
+        $code->setSendAt(new \DateTimeImmutable());
         $code->setExpiresAt((new \DateTime())->modify('+10 minutes'));
 
         $this->entityManager->persist($code);

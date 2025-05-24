@@ -4,6 +4,10 @@
 
 {% block page %}
     <form method="post" action="{{ path('app_login') }}" class="card card-md">
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
         {% if app.user is null and app.session.getFlashBag().has('error') %}
             <div class="alert alert-danger">Ошибка входа, пожалуйста проверьте корректность логина и пароля!</div>
         {% endif %}
@@ -35,7 +39,7 @@
                         <span class="input-group-text" onclick="togglePassword(this)" style="cursor: pointer;">
                                 {{ icon('eye') }}
                         </span>
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                        {#                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"> #}
                     </div>
                 </div>
 

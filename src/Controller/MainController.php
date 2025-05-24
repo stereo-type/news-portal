@@ -19,7 +19,6 @@ class MainController extends AbstractController
     #[Route('/', name: 'main')]
     public function instructions(): Response
     {
-        return $this->json(['test' => 'test']);
-        return $this->render('registration/instructions.html.twig');
+        return $this->render('dashboard.html.twig');
     }
 }

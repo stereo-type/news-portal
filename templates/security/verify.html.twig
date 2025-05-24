@@ -2,10 +2,34 @@
 {% extends 'security/auth.html.twig' %}
 {% block title %}Верификация {% endblock %}
 {% block page %}
-    <form method="post" action="{{ path('app_verify') }}" class="card card-md">
+    <form method="post" action="{{ path('app_verify', {'id': id}) }}" class="card card-md">
 
         <div class="card-body">
 
+            <h2 class="card-title text-center mb-4">
+                {{ icon('news') }}
+                <span class="p-2">Подтверждение</span>
+            </h2>
+
+
+            {{ form_start(verifyForm) }}
+            <div class="mb-3">
+                {{ form_row(verifyForm.code) }}
+            </div>
+
+            <p>
+                <a href="{{ path('app_resend', {'id': id}) }}"
+                   data-controller="resend-link"
+                   data-action="click->resend-link#handleResend"
+                   data-turbo="false"
+                >
+                    Отправить повторно
+                </a>
+            </p>
+            <div class="mb-3">
+                {{ form_row(verifyForm.send) }}
+            </div>
+            {{ form_end(verifyForm) }}
         </div>
     </form>
 {% endblock %}

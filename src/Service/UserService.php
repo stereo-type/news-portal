@@ -10,14 +10,19 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\User;
+use App\Message\SendTelegramConfirmationCode;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
 class UserService
 {
 
-
-    public function __construct(private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private TelegramCodeGenerator $codeGenerator,
+        private MessageBusInterface $bus
+    ) {
     }
 
     public function createUser(User $user): User
@@ -26,16 +31,48 @@ class UserService
         $user->setRegisteredAt(new \DateTimeImmutable());
         $user->setRoles(['ROLE_USER']);
 
-
-        // TODO: generate code + send to queue
-
-
-
-
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
+        $code = $this->codeGenerator->generateFor($user);
+        $this->bus->dispatch(new SendTelegramConfirmationCode($user->getEmail(), $code->getCode()));
+
         return $user;
+    }
+
+    public function verifyUser(int $userId, string $code): void
+    {
+        $user = $this->entityManager->getRepository(User::class)->find($userId);
+        if (!$user) {
+            throw new UserNotFoundException('Пользователь не найден');
+        }
+        if ($user->isVerified()) {
+            throw new \InvalidArgumentException('Пользователь уже подтвержден');
+        }
+        $codes = $user->getTelegramCodes();
+
+        $currentCode = null;
+        foreach ($codes as $c) {
+            if ($c->getCode() === $code) {
+                $currentCode = $c;
+                break;
+            }
+        }
+        if ($currentCode === null) {
+            throw new \InvalidArgumentException('Не верный код подтверждения');
+        }
+
+        if (null !== $currentCode->getUsedAt()) {
+            throw new \InvalidArgumentException('Код уже использован');
+        }
+        if ($currentCode->getExpiresAt() < new \DateTimeImmutable()) {
+            throw new \InvalidArgumentException('Время действия кода вышло');
+        }
+
+        $currentCode->setUsedAt(new \DateTimeImmutable());
+        $user->setIsVerified(true);
+
+        $this->entityManager->flush();
     }
 
 }

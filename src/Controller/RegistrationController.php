@@ -11,16 +11,21 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormTypeForm;
+use App\Form\VerifyTypeForm;
+use App\Message\SendTelegramConfirmationCode;
+use App\Service\TelegramBotService;
+use App\Service\TelegramCodeGenerator;
 use App\Service\UserService;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Throwable;
 
 class RegistrationController extends AbstractController
 {
@@ -31,7 +36,6 @@ class RegistrationController extends AbstractController
     public function register(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $entityManager,
         SessionInterface $session,
         UserService $userService,
     ): Response {
@@ -50,9 +54,9 @@ class RegistrationController extends AbstractController
             if ($form->isValid()) {
                 try {
                     $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
-                    $userService->createUser($user);
+                    $created = $userService->createUser($user);
 
-                    return $this->redirectToRoute('app_confirmation_instructions');
+                    return $this->redirectToRoute('app_confirmation_instructions', ['id' => $created->getId()]);
                 } catch (\Throwable $e) {
                     $this->addFlash('error', $e->getMessage());
 
@@ -77,15 +81,67 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    #[Route('/register/instructions', name: 'app_confirmation_instructions')]
-    public function instructions(): Response
+    #[Route('/register/instructions/{id}', name: 'app_confirmation_instructions')]
+    public function instructions(int $id): Response
     {
-        return $this->render('security/instructions.html.twig');
+        return $this->render('security/instructions.html.twig', ['id' => $id]);
     }
 
-    #[Route('/register/verify', name: 'app_verify')]
-    public function verify(): Response
+    #[Route('/register/verify/{id}', name: 'app_verify')]
+    public function verify(int $id, Request $request, UserService $userService): Response
     {
-        return $this->render('security/verify.html.twig');
+        $form = $this->createForm(VerifyTypeForm::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    $requestContent = $request->request->all();
+                    $data = $requestContent[$form->getName()] ?? [];
+                    if (isset($data['code'])) {
+                        $userService->verifyUser($id, $form->getData()['code']);
+
+                        return $this->redirectToRoute('app_login');
+                    }
+
+                    throw new \RuntimeException('Code is required.');
+                } catch (Throwable $e) {
+                    $this->addFlash('error', $e->getMessage());
+
+                    return $this->redirectToRoute('app_verify', ['id' => $id]);
+                }
+            } else {
+                $this->addFlash('error', 'Unexpected error');
+
+                return $this->redirectToRoute('app_verify', ['id' => $id]);
+            }
+        }
+
+        return $this->render('security/verify.html.twig', ['verifyForm' => $form->createView(), 'id' => $id]);
     }
+
+    #[Route('/register/resent/{id}', name: 'app_resend')]
+    public function resendTelegramKey(
+        int $id,
+        EntityManagerInterface $entityManager,
+        TelegramCodeGenerator $codeGenerator,
+        MessageBusInterface $bus,
+    ): Response {
+        $success = true;
+        $msg = null;
+        try {
+            $user = $entityManager->getRepository(User::class)->find($id);
+            if (!$user) {
+                throw $this->createNotFoundException();
+            }
+            $code = $codeGenerator->generateFor($user);
+            $bus->dispatch(new SendTelegramConfirmationCode($user->getEmail(), $code->getCode()));
+        } catch (\Throwable $e) {
+            $success = false;
+            $msg = $e->getMessage();
+        }
+
+        return $this->json(['success' => $success, 'message' => $msg]);
+    }
+
 }

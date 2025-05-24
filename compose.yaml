@@ -12,14 +12,37 @@ services:
     ports:
       - "${MYSQL_PORT:-3306}:3306"
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "${MYSQL_HOST:-127.0.0.1}"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "${MYSQL_HOST:-127.0.0.1}" ]
       timeout: 5s
       retries: 5
       start_period: 30s
     volumes:
       - news-portal_data:/var/lib/mysql:rw
+    ###< doctrine/doctrine-bundle ###
+    ###> rabbitmq ###
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: "${APP_NAME}-rabbitmq"
+    hostname: "${APP_NAME}-rabbitmq"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "${RABBITMQ_AMQP_PORT:-5672}:5672"         # AMQP порт
+      - "${RABBITMQ_UI_PORT:-15672}:15672"         # Web UI: http://localhost:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  ###< rabbitmq ###
 
 volumes:
   ###> doctrine/doctrine-bundle ###
   news-portal_data:
   ###< doctrine/doctrine-bundle ###
+  ###> rabbitmq ###
+  rabbitmq_data:
+  ###< rabbitmq ###
