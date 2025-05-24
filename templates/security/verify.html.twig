@@ -1,0 +1,11 @@
+{# templates/registration/register.html.twig #}
+{% extends 'security/auth.html.twig' %}
+{% block title %}Верификация {% endblock %}
+{% block page %}
+    <form method="post" action="{{ path('app_verify') }}" class="card card-md">
+
+        <div class="card-body">
+
+        </div>
+    </form>
+{% endblock %}

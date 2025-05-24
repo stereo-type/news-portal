@@ -1,3 +1,27 @@
 body {
-    background-color: skyblue;
+    font-feature-settings: "liga" 0, "cv03", "cv04", "cv11";
+    height: 100%;
+    letter-spacing: 0;
+    min-height: 100%;
+    padding: 0 !important;
+    position: relative;
+    text-rendering: optimizeLegibility;
+    touch-action: manipulation;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    position: relative;
+}
+
+.page-center {
+    justify-content: center;
+}
+
+.container-tight {
+    max-width: 30rem;
 }

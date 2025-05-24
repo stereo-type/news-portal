@@ -1,0 +1,52 @@
+{% extends 'security/auth.html.twig' %}
+
+{% block title %}Вход {% endblock %}
+
+{% block page %}
+    <form method="post" action="{{ path('app_login') }}" class="card card-md">
+        {% if app.user is null and app.session.getFlashBag().has('error') %}
+            <div class="alert alert-danger">Ошибка входа, пожалуйста проверьте корректность логина и пароля!</div>
+        {% endif %}
+
+        <div class="card-body">
+            {% if app.user %}
+                <div class="mb-3 text-center">
+                    Вы вошли как
+                    {{ app.user.email }}<br/>
+                    <a href="{{ path('main') }}">Рабочий стол</a>
+                    / <a href="{{ path('app_logout') }}">Выход</a>
+                </div>
+            {% else %}
+
+                <h2 class="card-title text-center mb-4">
+                    {{ icon('news') }}
+                    <span class="p-2">Вход</span>
+                </h2>
+
+
+                {{ form_start(loginForm) }}
+                <div class="mb-3">
+                    {{ form_row(loginForm.username) }}
+                </div>
+                <div class="mb-3 row">
+                    {{ form_label(loginForm.password) }} {# Отдельно лейбл #}
+                    <div class="input-group input-group-flat" style="box-shadow: none;">
+                        {{ form_widget(loginForm.password, {'attr': {'type': 'password'}}) }} {# Отдельно поле #}
+                        <span class="input-group-text" onclick="togglePassword(this)" style="cursor: pointer;">
+                                {{ icon('eye') }}
+                        </span>
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    </div>
+                </div>
+
+                <p class="mb-2">
+                    <a href="{{ path('app_register') }}">Регистрация</a>
+                </p>
+                <div class="mb-3">
+                    {{ form_row(loginForm.login) }}
+                </div>
+                {{ form_end(loginForm) }}
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

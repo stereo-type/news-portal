@@ -1,0 +1,14 @@
+@import '@tabler/core/dist/css/tabler.css';
+
+:root,
+[data-bs-theme=light] {
+    --tblr-font-sans-serif:    -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+}
+
+.icon {
+    --tblr-icon-size: 24px;
+}
+
+.btn {
+    --tblr-btn-icon-size: 24px;
+}

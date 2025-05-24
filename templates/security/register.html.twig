@@ -1,0 +1,57 @@
+{# templates/registration/register.html.twig #}
+{% extends 'security/auth.html.twig' %}
+{% block title %}Регистрация {% endblock %}
+{% block page %}
+    <form method="post" action="{{ path('app_register') }}" class="card card-md">
+
+        <div class="card-body">
+            {% if app.user %}
+                <div class="mb-3 text-center">
+                    Вы вошли как
+                    {{ app.user.email }}<br/>
+                    <a href="{{ path('main') }}">Рабочий стол</a>
+                    / <a href="{{ path('app_logout') }}">Выход</a>
+                </div>
+            {% else %}
+
+                <h2 class="card-title text-center mb-4">
+                    {{ icon('news') }}
+                    <span class="p-2">Регистрация</span>
+                </h2>
+
+
+                {{ form_start(registrationForm) }}
+                <div class="mb-3">
+                    {{ form_row(registrationForm.email) }}
+                </div>
+                <div class="mb-3 row">
+                    {{ form_label(registrationForm.password.first) }} {# Отдельно лейбл #}
+                    <div class="input-group input-group-flat" style="box-shadow: none;">
+                        {{ form_widget(registrationForm.password.first, {'attr': {'type': 'password'}}) }} {# Отдельно поле #}
+                        <span class="input-group-text" onclick="togglePassword(this)" style="cursor: pointer;">
+                                {{ icon('eye') }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    {{ form_label(registrationForm.password.second) }} {# Отдельно лейбл #}
+                    <div class="input-group input-group-flat" style="box-shadow: none;">
+                        {{ form_widget(registrationForm.password.second, {'attr': {'type': 'password'}}) }} {# Отдельно поле #}
+                        <span class="input-group-text" onclick="togglePassword(this)" style="cursor: pointer;">
+                                {{ icon('eye') }}
+                        </span>
+                    </div>
+                </div>
+
+                <p class="mb-2">
+                    <a href="{{ path('app_login') }}">Вход</a>
+                </p>
+                <div class="mb-3">
+                    {{ form_row(registrationForm.register) }}
+                </div>
+                {{ form_end(registrationForm) }}
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}

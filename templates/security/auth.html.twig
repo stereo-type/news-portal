@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Вход{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function togglePassword(element) {
+            const inputGroup = element.closest('.input-group');
+            const passwordInput = inputGroup.querySelector('input');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="page page-center">
+        <div class="container-tight py-4">
+            {% for flashMessage in app.flashes('error') %}
+                <div class="alert alert-danger flash-error">{{ flashMessage }}</div>
+            {% endfor %}
+
+            {% for flashMessage in app.flashes('success') %}
+                <div class="alert alert-success flash-success">{{ flashMessage }}</div>
+            {% endfor %}
+
+            {% block page %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
