@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TelegramBotService
@@ -42,9 +41,6 @@ class TelegramBotService
                 ],
             ]);
         } catch (\Throwable $e) {
-           if($e instanceof ClientException) {
-               dd($e->getMessage());
-           }
             throw new \RuntimeException("Ошибка при отправке в Telegram: " . $e->getMessage());
         }
     }

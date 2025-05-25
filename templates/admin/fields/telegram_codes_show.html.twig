@@ -1,0 +1,24 @@
+<table class="table">
+    <tbody>
+    <tr class="sonata-ba-view-container">
+        <th>{{ field_description.label|default('Коды Telegram') }}</th>
+        <td><ul class="list-unstyled mt-2">
+                {% for code in value %}
+                    <li class="mb-2">
+                        <span class="fw-bold">{{ code.code }}</span>
+                        <span class="text-muted"> — {{ code.sendAt|date('Y-m-d H:i:s') }}</span>
+
+                        {% if code.isUsed %}
+                            <span class="label label-info ms-2">Использован</span>
+                        {% elseif code.isExpired %}
+                            <span class="label label-danger ms-2">Истёк</span>
+                        {% else %}
+                            <span class="label label-success ms-2">Активен</span>
+                        {% endif %}
+                    </li>
+                {% else %}
+                    <li><em>Нет кодов</em></li>
+                {% endfor %}
+            </ul></td>
+    </tbody>
+</table>

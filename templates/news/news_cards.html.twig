@@ -1,0 +1,27 @@
+{% for news in newsList %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-img-top" style="background-image: url('{{ news.image }}'); background-size: cover; background-position: center; height: 200px;"></div>
+
+            <div class="card-body d-flex flex-column">
+                <h3 class="card-title">
+                    <a href="{{ news.url }}" target="_blank" class="text-decoration-none">{{ news.title }}</a>
+                </h3>
+                <div class="text-muted mb-2">
+                    {{ news.sourceName }} • {{ news.publishedAt|date('d.m.Y H:i') }}
+                </div>
+                <p class="card-text flex-grow-1">{{ news.description }}</p>
+            </div>
+
+            <div class="card-footer">
+                <a href="{{ news.url }}" target="_blank" class="btn btn-primary w-100">
+                    Читать полностью
+                </a>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="col-12">
+        <div class="alert alert-warning">Новости не найдены.</div>
+    </div>
+{% endfor %}

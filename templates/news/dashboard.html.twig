@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+{% block title %}Новости{% endblock %}
+{% block body %}
+    <div class="container py-5">
+        <div class="d-flex justify-content-between">
+        <h1 class="mb-4">Лента новостей</h1>
+        <a class="btn btn-primary align-self-center" href="/admin" target="_blank">Администрирование</a>
+        </div>
+
+        <input id="news-search" class="form-control mb-4" type="text" placeholder="Поиск новостей...">
+
+        <div class="position-relative">
+            <div id="news-overlay"
+                 class="position-absolute w-100 h-100 justify-content-center align-items-center"
+                 style="background-color: rgba(255,255,255,0.7); display: none; z-index: 10;">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+
+            <div id="news-container" class="container py-4 position-relative" style="z-index: 1;">
+                <div class="row row-cards" id="news-cards">
+                    {% include 'news/news_cards.html.twig' with { newsList: newsList } %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('news-search');
+        const overlay = document.getElementById('news-overlay');
+        const newsCards = document.getElementById('news-cards');
+
+        let debounceTimer = null;
+
+        searchInput.addEventListener('input', function () {
+            const query = this.value;
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                overlay.style.display = 'flex';
+
+                fetch(`/search-news?q=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        newsCards.innerHTML = data.html;
+                    })
+                    .finally(() => {
+                        overlay.style.display = 'none';
+                    });
+            }, 400);
+        });
+    </script>
+{% endblock %}

@@ -25,6 +25,7 @@ Encore
     options.implementation = require('sass'); // Использование Dart Sass
   })
   .enablePostCssLoader()
+  .autoProvidejQuery()
   .addRule({
     test: /\.(png|jpg|jpeg|gif|ico|svg|webp)$/,
     use: [

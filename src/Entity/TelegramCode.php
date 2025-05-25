@@ -89,4 +89,14 @@ class TelegramCode
     {
         $this->usedAt = $usedAt;
     }
+
+    public function isExpired(): bool
+    {
+        return $this->expiresAt < new \DateTime();
+    }
+
+    public function isUsed(): bool
+    {
+        return null !== $this->usedAt;
+    }
 }

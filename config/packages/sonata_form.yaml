@@ -1,2 +1,40 @@
-sonata_form:
-    form_type: standard
+sonata_admin:
+    title: 'Портал новостей'
+    persist_filters: true
+    options:
+        html5_validate: true     # enable or disable html5 form validation
+        confirm_exit: true     # enable or disable a confirmation before navigating away
+        js_debug: '%env(bool:APP_DEBUG)%'    # enable or disable to show javascript debug messages
+#        use_select2: "%sonata.admin.options.select2%"     # enable or disable usage of the Select2 jQuery library
+        use_icheck: true
+        #    use_bootlint: '%env(bool:APP_DEBUG)%' # enable
+        use_stickyforms: true
+        form_type: 'standard'
+    global_search:
+        empty_boxes: show
+        admin_route: show
+    show_mosaic_button: false
+    breadcrumbs:
+        child_admin_route: show
+    dashboard:
+        blocks:
+            - { type: sonata.admin.block.admin_list, position: left }
+
+#    assets:
+#      stylesheets:
+##        - build/app.css
+##       Отключить при переработке стилей
+#        - bundles/sonataadmin/app.css
+    assets:
+        stylesheets:
+            - bundles/sonataadmin/app.css  # или /build/app.css
+        javascripts:
+            - bundles/sonataadmin/app.js   # или /build/app.js
+
+sonata_block:
+    blocks:
+        sonata.admin.block.admin_list:
+            contexts: [ admin ]
+
+#DOCUMENTATION
+#https://docs.sonata-project.org/projects/SonataAdminBundle/en/4.x/reference/configuration/

@@ -1,0 +1,1 @@
+*/30 * * * * cd /var/www/news_portal && /usr/bin/php bin/console app:import-news >> var/log/news_import.log 2>&1
