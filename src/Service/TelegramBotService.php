@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    TelegramBotServce.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ class TelegramBotService
     }
 
     /**
-     * Отправляет сообщение в Telegram
+     * Отправляет сообщение в Telegram.
      */
     public function sendMessage(string $message): void
     {
@@ -41,7 +41,7 @@ class TelegramBotService
                 ],
             ]);
         } catch (\Throwable $e) {
-            throw new \RuntimeException("Ошибка при отправке в Telegram: " . $e->getMessage());
+            throw new \RuntimeException('Ошибка при отправке в Telegram: ' . $e->getMessage());
         }
     }
 }

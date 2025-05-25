@@ -29,7 +29,6 @@ class TelegramCode
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $usedAt = null;
 
-
     public function getCode(): string
     {
         return $this->code;

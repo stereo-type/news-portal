@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    LoadNews.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ImportNewsCommand extends Command
 {
     public function __construct(
-        private readonly NewsService $service
+        private readonly NewsService $service,
     ) {
         parent::__construct();
     }
@@ -31,11 +31,11 @@ class ImportNewsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $result = $this->service->loadNews();
-        $output->writeln(sprintf("Импортировано %d новостей.", $result['totalLoaded']));
-        $output->writeln(sprintf("Ошибок: %d", $result['errorsCount']));
+        $output->writeln(sprintf('Импортировано %d новостей.', $result['totalLoaded']));
+        $output->writeln(sprintf('Ошибок: %d', $result['errorsCount']));
         if (!empty($result['errors'])) {
             foreach ($result['errors'] as $error) {
-                $output->writeln(sprintf("Ошибка: %s", $error));
+                $output->writeln(sprintf('Ошибка: %s', $error));
             }
         }
 

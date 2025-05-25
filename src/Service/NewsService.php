@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    NewsService.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -11,25 +11,25 @@ namespace App\Service;
 
 use App\DTO\NewsItemDTO;
 use App\Entity\NewsItem;
+use App\Mercure\NewsLoadedPublisher;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Throwable;
 
 class NewsService
 {
-
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validatorDto,
         private HttpClientInterface $client,
         private ParameterBagInterface $parameterBag,
+        private NewsLoadedPublisher $publisher,
+        private LoggerInterface $logger,
     ) {
     }
-
 
     public function stub(): string
     {
@@ -76,10 +76,9 @@ class NewsService
 }';
     }
 
-
     public function loadNews(): array
     {
-//        $data = $this->stub();
+        //        $data = $this->stub();
         $apiKey = $this->parameterBag->get('app.news.apikey');
         $url = sprintf('https://gnews.io/api/v4/top-headlines?country=ru&category=general&apikey=%s', $apiKey);
 
@@ -87,11 +86,17 @@ class NewsService
             $answer = $this->client->request('GET', $url);
             $data = $answer->getContent();
         } catch (\Throwable $e) {
-            throw new \RuntimeException("Ошибка при отправке запроса в АПИ новостей: " . $e->getMessage());
+            throw new \RuntimeException('Ошибка при отправке запроса в АПИ новостей: ' . $e->getMessage());
+        }
+        $result = $this->createFromData($data);
+
+        try {
+            $this->publisher->publish($result['totalLoaded']);
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
         }
 
-
-        return $this->createFromData($data);
+        return $result;
     }
 
     public function createFromData(string $data): array
@@ -105,17 +110,7 @@ class NewsService
                 $errors = $this->validatorDto->validate($instance);
 
                 if ($errors->count() > 0) {
-                    throw new \RuntimeException(
-                        implode(
-                            "\n",
-                            array_map(
-                                static function (ConstraintViolationInterface $item) {
-                                    return $item->getMessage();
-                                },
-                                (array)$errors
-                            )
-                        )
-                    );
+                    throw new \RuntimeException(implode("\n", array_map(static function (ConstraintViolationInterface $item) { return $item->getMessage(); }, (array) $errors)));
                 }
 
                 $blacklist = ['.ua', 'meduza.io', 'svoboda.org']; // сюда добавляешь всё, что нужно исключить
@@ -127,7 +122,7 @@ class NewsService
                 }
 
                 $this->createFromDto($instance, flush: false);
-            } catch (Throwable $e) {
+            } catch (\Throwable $e) {
                 $errorsList[] = $e->getMessage();
             }
         }
@@ -141,7 +136,6 @@ class NewsService
             'errors' => $errorsList,
         ];
     }
-
 
     public function createFromDto(NewsItemDTO $dto, bool $flush = true): NewsItem
     {

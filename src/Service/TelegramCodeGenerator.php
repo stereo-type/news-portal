@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    TelegramCodeGenerator.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ class TelegramCodeGenerator
     {
         $code = new TelegramCode();
         $code->setUser($user);
-        $code->setCode((string)random_int(100000, 999999));
+        $code->setCode((string) random_int(100000, 999999));
         $code->setSendAt(new \DateTimeImmutable());
         $code->setExpiresAt((new \DateTime())->modify('+10 minutes'));
 

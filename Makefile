@@ -50,12 +50,18 @@ jwt:
 
 #запуск в hyper-v для доступа с локальной машины
 serve:
-	symfony server:start --port=8001 --allow-all-ip -d
+	symfony server:start --port=8001 --allow-all-ip -d --no-tls
 
 debug-dotenv:
 	php bin/console debug:dotenv
 debug-vars:
 	symfony console debug:container --env-vars
+
+mercure-key:
+	openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+	  -keyout docker/mercure/certs/mercure.key \
+	  -out docker/mercure/certs/mercure.crt \
+	  -subj "/CN=192.168.1.104"
 
 consume:
 	php bin/console messenger:consume telegram --verbose

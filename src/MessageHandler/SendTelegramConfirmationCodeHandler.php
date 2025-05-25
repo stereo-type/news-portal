@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    SendTelegramConfirmationCodeHandler.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -17,7 +17,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 class SendTelegramConfirmationCodeHandler
 {
     public function __construct(
-        private TelegramBotService $botService
+        private TelegramBotService $botService,
     ) {
     }
 

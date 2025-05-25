@@ -38,7 +38,7 @@ class MustExistValidator extends ConstraintValidator
         if (!$entity) {
             $this->context->buildViolation($constraint->message)
                           ->setParameter('{{ entity }}', $constraint->entityClass)
-                          ->setParameter('{{ value }}', (string)$value)
+                          ->setParameter('{{ value }}', (string) $value)
                           ->addViolation();
         }
     }

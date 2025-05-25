@@ -3,7 +3,9 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Mercure\UserLoggedPublisher;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,8 +26,12 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator, private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private UrlGeneratorInterface $urlGenerator,
+        private EntityManagerInterface $entityManager,
+        private UserLoggedPublisher $publisher,
+        private LoggerInterface $logger,
+    ) {
     }
 
     public function authenticate(Request $request): Passport
@@ -57,6 +63,11 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             $user->setLastLoginAt(new \DateTimeImmutable());
             $this->entityManager->persist($user);
             $this->entityManager->flush();
+            try {
+                $this->publisher->publish($user->getEmail());
+            } catch (\Throwable $e) {
+                $this->logger->error($e->getMessage());
+            }
         }
 
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {

@@ -1,11 +1,17 @@
 {% extends 'base.html.twig' %}
 {% block title %}Новости{% endblock %}
 {% block body %}
+    <div id="notifications-container"></div>
+
     <div class="container py-5">
         <div class="d-flex justify-content-between">
-        <h1 class="mb-4">Лента новостей</h1>
-        <a class="btn btn-primary align-self-center" href="/admin" target="_blank">Администрирование</a>
+            <h1 class="mb-4">Лента новостей</h1>
+            <div>
+                <a class="btn btn-primary align-self-center" href="/admin" target="_blank">Администрирование</a>
+                <a class="btn btn-secondary align-self-center" href="/logout">Выход</a>
+            </div>
         </div>
+
 
         <input id="news-search" class="form-control mb-4" type="text" placeholder="Поиск новостей...">
 
@@ -51,4 +57,77 @@
             }, 400);
         });
     </script>
+
+
+
+    <script>
+        const urlUserCreated = new URL('{{ mercure }}');
+        urlUserCreated.searchParams.append('topic', 'user/created');
+
+        const urlUserLoggedIn = new URL('{{ mercure }}');
+        urlUserLoggedIn.searchParams.append('topic', 'user/logged');
+
+        const urlNewsLoaded = new URL('{{ mercure }}');
+        urlNewsLoaded.searchParams.append('topic', 'news/loaded');
+
+        const eventSourceUserCreated = new EventSource(urlUserCreated, {
+            withCredentials: true,
+        });
+        const eventUserLoggedIn = new EventSource(urlUserLoggedIn, {
+            withCredentials: true,
+        });
+
+        const eventNewsLoaded = new EventSource(urlNewsLoaded, {
+            withCredentials: true,
+        });
+
+        eventSourceUserCreated.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const msg = 'Новый пользователь зарегистрирован: ' + data.email;
+            showNotification(msg);
+
+        };
+        eventUserLoggedIn.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const msg = 'Пользователь вошел в систему: ' + data.email;
+            console.log(msg);
+            showNotification(msg);
+        };
+
+        eventNewsLoaded.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const msg = 'Загружено новых статей: ' + data.count;
+            console.log(msg);
+            showNotification(msg);
+        };
+
+        const container = document.getElementById('notifications-container');
+
+        function showNotification(message) {
+            try {
+                const notif = document.createElement('div');
+                notif.className = 'notification';
+                notif.textContent = message;
+
+                notif.addEventListener('click', () => {
+                    notif.style.opacity = '0';
+                    setTimeout(() => notif.remove(), 300);
+                });
+
+                container.appendChild(notif);
+
+                setTimeout(() => {
+                    notif.style.opacity = '0';
+                    setTimeout(() => notif.remove(), 300);
+                }, 5000);
+
+            } catch (Error) {
+                console.error('Непредвиденная ошибка')
+            }
+
+        }
+
+    </script>
+
+
 {% endblock %}

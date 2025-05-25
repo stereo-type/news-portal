@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    MainController.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -18,13 +18,13 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
 {
-
     #[Route('/', name: 'main')]
     public function dashboard(NewsItemRepository $repository): Response
     {
         $news = $repository->findBy([], ['publishedAt' => 'DESC'], 10);
+        $mercureDomen = 'http://' . $_ENV['APP_DOMAIN'] . ':' . $_ENV['MERCURE_CLIENT_PORT'] . '/.well-known/mercure';
 
-        return $this->render('news/dashboard.html.twig', ['newsList' => $news]);
+        return $this->render('news/dashboard.html.twig', ['newsList' => $news, 'mercure' => $mercureDomen]);
     }
 
     #[Route('/search-news', name: 'search_news', methods: ['GET'])]

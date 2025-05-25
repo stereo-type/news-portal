@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    UserService.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -10,18 +10,21 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\User;
+use App\Mercure\UserCreatedPublisher;
 use App\Message\SendTelegramConfirmationCode;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
 class UserService
 {
-
     public function __construct(
         private EntityManagerInterface $entityManager,
         private TelegramCodeGenerator $codeGenerator,
-        private MessageBusInterface $bus
+        private MessageBusInterface $bus,
+        private UserCreatedPublisher $publisher,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -36,6 +39,12 @@ class UserService
 
         $code = $this->codeGenerator->generateFor($user);
         $this->bus->dispatch(new SendTelegramConfirmationCode($user->getEmail(), $code->getCode()));
+
+        try {
+            $this->publisher->publish($user->getId(), $user->getEmail());
+        } catch (\Throwable $e) {
+            $this->logger->error($e->getMessage());
+        }
 
         return $user;
     }
@@ -58,7 +67,7 @@ class UserService
                 break;
             }
         }
-        if ($currentCode === null) {
+        if (null === $currentCode) {
             throw new \InvalidArgumentException('Не верный код подтверждения');
         }
 
@@ -74,5 +83,4 @@ class UserService
 
         $this->entityManager->flush();
     }
-
 }

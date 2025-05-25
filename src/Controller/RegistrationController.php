@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    RegistrationController.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -13,7 +13,6 @@ use App\Entity\User;
 use App\Form\RegistrationFormTypeForm;
 use App\Form\VerifyTypeForm;
 use App\Message\SendTelegramConfirmationCode;
-use App\Service\TelegramBotService;
 use App\Service\TelegramCodeGenerator;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,9 +22,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Throwable;
+use Symfony\Component\Routing\Annotation\Route;
 
 class RegistrationController extends AbstractController
 {
@@ -105,7 +103,7 @@ class RegistrationController extends AbstractController
                     }
 
                     throw new \RuntimeException('Code is required.');
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     $this->addFlash('error', $e->getMessage());
 
                     return $this->redirectToRoute('app_verify', ['id' => $id]);
@@ -143,5 +141,4 @@ class RegistrationController extends AbstractController
 
         return $this->json(['success' => $success, 'message' => $msg]);
     }
-
 }

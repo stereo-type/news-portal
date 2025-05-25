@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    NewsItemDTO.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -13,42 +13,40 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class NewsItemDTO
 {
-
-    #[Assert\NotBlank(message: "Заголовок не может быть пустым")]
+    #[Assert\NotBlank(message: 'Заголовок не может быть пустым')]
     private string $title;
 
-    #[Assert\NotBlank(message: "Описание не может быть пустым")]
+    #[Assert\NotBlank(message: 'Описание не может быть пустым')]
     private string $description;
 
-    #[Assert\NotBlank(message: "Контент не может быть пустым")]
+    #[Assert\NotBlank(message: 'Контент не может быть пустым')]
     private string $content;
-    #[Assert\NotBlank(message: "Ссылка не может быть пустой")]
+    #[Assert\NotBlank(message: 'Ссылка не может быть пустой')]
     private string $url;
 
-    #[Assert\NotBlank(message: "Картинка не может быть пустой")]
+    #[Assert\NotBlank(message: 'Картинка не может быть пустой')]
     private string $image;
 
-    #[Assert\NotBlank(message: "Дата обязательна")]
+    #[Assert\NotBlank(message: 'Дата обязательна')]
     private \DateTimeImmutable $publishedAt;
 
-    #[Assert\NotBlank(message: "Название источника обязательно")]
+    #[Assert\NotBlank(message: 'Название источника обязательно')]
     private string $sourceName;
 
-    #[Assert\NotBlank(message: "Ссылка на источник обязательно")]
+    #[Assert\NotBlank(message: 'Ссылка на источник обязательно')]
     private string $sourceUrl;
-
 
     public static function fromArray(array $data): self
     {
         $instance = new self();
         foreach ($data as $property => $value) {
             if (property_exists($instance, $property)) {
-                if ($property === 'publishedAt') {
+                if ('publishedAt' === $property) {
                     $instance->publishedAt = new \DateTimeImmutable($value);
                 } else {
                     $instance->{$property} = $value;
                 }
-            } elseif ($property === 'source') {
+            } elseif ('source' === $property) {
                 $instance->sourceName = $value['name'];
                 $instance->sourceUrl = $value['url'];
             }
@@ -136,6 +134,4 @@ class NewsItemDTO
     {
         $this->url = $url;
     }
-
-
 }

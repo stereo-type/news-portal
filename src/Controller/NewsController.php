@@ -1,6 +1,6 @@
 <?php
+
 /**
- * @package    NewsController.php
  * @copyright  2025 Zhalayletdinov Vyacheslav evil_tut@mail.ru
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -16,7 +16,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class NewsController extends AbstractController
 {
-
     #[Route('/news/load')]
     public function verify(NewsService $newsService): Response
     {
@@ -24,5 +23,4 @@ class NewsController extends AbstractController
 
         return $this->json($result);
     }
-
 }

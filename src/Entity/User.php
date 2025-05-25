@@ -3,13 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Service\Validator\Constraints as CustomAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Service\Validator\Constraints as CustomAssert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -20,8 +20,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\NotBlank(message: "Email не может быть пустым")]
-    #[Assert\Email(message: "Некорректный email адрес")]
+    #[Assert\NotBlank(message: 'Email не может быть пустым')]
+    #[Assert\Email(message: 'Некорректный email адрес')]
     #[CustomAssert\UniqueValue(entityClass: User::class, field: 'email', message: 'Email "{{ value }}" уже используется')]
     #[ORM\Column(length: 180, unique: true)]
     private string $email;
@@ -32,10 +32,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = [];
 
-    #[Assert\NotBlank(message: "Пароль не может быть пустым")]
+    #[Assert\NotBlank(message: 'Пароль не может быть пустым')]
     #[Assert\Length(
         min: 6,
-        minMessage: "Пароль должен содержать минимум {{ limit }} символов"
+        minMessage: 'Пароль должен содержать минимум {{ limit }} символов'
     )]
     #[ORM\Column]
     private string $password;
@@ -138,11 +138,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->telegramCodes;
     }
 
+    /**
+     * @param Collection<int,TelegramCode> $telegramCodes
+     */
     public function setTelegramCodes(Collection $telegramCodes): void
     {
         $this->telegramCodes = $telegramCodes;
     }
-
 
     public function addTelegramCode(TelegramCode $telegramCode): static
     {

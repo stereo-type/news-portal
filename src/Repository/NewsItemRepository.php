@@ -16,7 +16,6 @@ class NewsItemRepository extends ServiceEntityRepository
         parent::__construct($registry, NewsItem::class);
     }
 
-
     public function search(string $query): array
     {
         return $this->createQueryBuilder('n')

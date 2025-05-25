@@ -40,7 +40,7 @@ services:
                 manager_type: orm,
                 model_class: App\Entity\User,
                 label: "Пользователи",
-                group: "Пользователи",
+                group: "Справочники",
             }
     news:
         class: App\Admin\NewsAdmin
@@ -50,5 +50,5 @@ services:
                 manager_type: orm,
                 model_class: App\Entity\NewsItem,
                 label: "Новости",
-                group: "Новости",
+                group: "Справочники",
             }

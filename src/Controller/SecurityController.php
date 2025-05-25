@@ -22,7 +22,6 @@ class SecurityController extends AbstractController
 
         $exception = $request->getSession()->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
 
-
         if ($form->isSubmitted() && $form->isValid()) {
             return $this->redirectToRoute('app_main');
         }
