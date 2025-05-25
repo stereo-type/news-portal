@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class NewsItemDTO
 {
     #[Assert\NotBlank(message: 'Заголовок не может быть пустым')]
+    #[Assert\Length(min: 1, max: 255)]
     private string $title;
 
     #[Assert\NotBlank(message: 'Описание не может быть пустым')]
@@ -22,18 +23,22 @@ class NewsItemDTO
     #[Assert\NotBlank(message: 'Контент не может быть пустым')]
     private string $content;
     #[Assert\NotBlank(message: 'Ссылка не может быть пустой')]
+    #[Assert\Length(min: 1, max: 255)]
     private string $url;
 
     #[Assert\NotBlank(message: 'Картинка не может быть пустой')]
+    #[Assert\Length(min: 1, max: 512)]
     private string $image;
 
     #[Assert\NotBlank(message: 'Дата обязательна')]
     private \DateTimeImmutable $publishedAt;
 
     #[Assert\NotBlank(message: 'Название источника обязательно')]
+    #[Assert\Length(min: 1, max: 255)]
     private string $sourceName;
 
     #[Assert\NotBlank(message: 'Ссылка на источник обязательно')]
+    #[Assert\Length(min: 1, max: 255)]
     private string $sourceUrl;
 
     public static function fromArray(array $data): self

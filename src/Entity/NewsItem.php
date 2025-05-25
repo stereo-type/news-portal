@@ -26,7 +26,7 @@ class NewsItem
     #[ORM\Column(length: 255)]
     private string $url;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 512)]
     private string $image;
 
     #[ORM\Column]
